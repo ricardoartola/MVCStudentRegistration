@@ -50,12 +50,15 @@ namespace MVCStudentRegistration.Controllers
         {
             if (ModelState.IsValid)
             {
-                Mapper.CreateMap<StudentViewModel, Student>();
-                var student = Mapper.Map<Student>(studentVM);
+                //Mapper.CreateMap<StudentViewModel, Student>();
+                //var student = Mapper.Map<Student>(studentVM);
+                var student = new Student();
+                student.Name = studentVM.Name;
+                student.EnrollmentDate = studentVM.EnrollmentDate;
                 if (studentVM.Photo != null)
                     student.Photo = ImageConverter.ByteArrayFromPostedFile(studentVM.Photo);
                 db.Students.Add(student);
-                db.SaveChanges();
+                db.SaveChanges();//commit into the database
                 return RedirectToAction("Index");
             }
 

@@ -11,7 +11,6 @@ namespace MVCStudentRegistration.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
-
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime EnrollmentDate { get; set; }
         public byte[] Photo { get; set; }
