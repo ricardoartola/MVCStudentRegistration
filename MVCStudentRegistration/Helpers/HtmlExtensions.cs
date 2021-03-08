@@ -31,5 +31,17 @@ namespace MVCStudentRegistration.Helpers
                 builder.MergeAttribute("width", width.ToString());
             return MvcHtmlString.Create(builder.ToString(TagRenderMode.SelfClosing));
         }
+
+        public static IHtmlString GetArrow(this HtmlHelper helper, string currentSortBy, string sortBy, string sortDir)
+        {
+            if (currentSortBy == sortBy)
+            {
+                if (sortDir == "asc")
+                    return helper.Raw(@"<span>&uarr;</span>");
+                else
+                    return helper.Raw(@"<span>&darr;</span>");
+            }
+            return helper.Raw("");
+        }
     }
 }

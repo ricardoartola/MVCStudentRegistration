@@ -15,9 +15,35 @@ namespace MVCStudentRegistration.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Students
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder, string sortDir, string searchString)
         {
-            return View(db.Students.ToList());
+            ViewBag.SearchString = searchString;
+            ViewBag.sortOrder = sortOrder;
+            ViewBag.sortDir = sortDir;
+            
+            var students = db.Students.AsQueryable();
+            if (!string.IsNullOrEmpty(searchString))
+                students =  students.Where(s => s.Name.Contains(searchString));
+            
+            if (sortOrder!=null)
+            {
+                switch (sortOrder.ToLower())
+                {
+                    case "name":
+                        if (sortDir.ToLower() == "desc")
+                            students = students.OrderByDescending(s => s.Name);
+                        else
+                            students = students.OrderBy(s => s.Name);
+                        break;
+                    case "enrollmentdate":
+                        if (sortDir.ToLower() == "desc")
+                            students = students.OrderByDescending(s => s.EnrollmentDate);
+                        else
+                            students = students.OrderBy(s => s.EnrollmentDate);
+                        break;
+                }
+            }
+            return View(students.ToList());
         }
 
         // GET: Students/Details/5

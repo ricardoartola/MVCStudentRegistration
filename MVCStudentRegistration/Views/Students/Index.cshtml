@@ -10,13 +10,30 @@
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+
+
+<div class="row">
+    <div class="col-md-3">
+        @using (Html.BeginForm("Index", "Students", FormMethod.Get))
+        {
+            <div class="input-group addon">
+                <input class="form-control" placeholder="student name" name="searchString" type="text" value="@ViewBag.SearchString" />
+                <button class="btn btn-default" type="submit">Search</button>
+            </div>
+        }
+    </div>
+</div>
+
+
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.ActionLink("Name", "Index", new { sortOrder = "name", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.SearchString })
+            @Html.GetArrow((string)ViewBag.sortOrder, "name", (string)ViewBag.sortDir)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EnrollmentDate)
+            @Html.ActionLink("EnrollmentDate", "Index", new { sortOrder = "enrollmentDate", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.SearchString })
+            @Html.GetArrow((string)ViewBag.sortOrder, "enrollmentDate", (string)ViewBag.sortDir)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Photo)
@@ -24,26 +41,27 @@
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Name)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.EnrollmentDate)
-        </td>
-        <td>
-            @if (item.Photo != null)
-            {
-                @Html.GetThumbnail(item.Photo)
-            }
-        </td>
-        <td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-            @Html.ActionLink("Details", "Details", new { id=item.Id }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @item.Name
+            </td>
+            <td>
+                @item.EnrollmentDate.ToShortDateString()
+            </td>
+            <td>
+                @if (item.Photo != null)
+                {
+                    @Html.GetThumbnail(item.Photo)
+                }
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+            </td>
+        </tr>
+    }
 
 </table>
