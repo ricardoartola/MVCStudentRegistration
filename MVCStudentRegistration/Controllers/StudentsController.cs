@@ -16,16 +16,12 @@ namespace MVCStudentRegistration.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Students
-        public ActionResult Index(string sortDir, string searchString, string currentFilter, int? page, string sortOrder = "")
+        public ActionResult Index(string sortDir, string currentFilter, string searchString, int? page, string sortOrder = "")
         {
             if (searchString != null)
-            {
                 page = 1;
-            }
             else
-            {
                 searchString = currentFilter;
-            }
 
             ViewBag.CurrentFilter = searchString;
             ViewBag.sortOrder = sortOrder;
@@ -34,7 +30,6 @@ namespace MVCStudentRegistration.Controllers
             var students = db.Students.AsQueryable();
             if (!string.IsNullOrEmpty(searchString))
                 students = students.Where(s => s.Name.Contains(searchString));
-
             switch (sortOrder.ToLower())
             {
                 case "name":
@@ -53,11 +48,13 @@ namespace MVCStudentRegistration.Controllers
                     students = students.OrderBy(s => s.Name);
                     break;
             }
-
             int pageSize = 2;
             int pageNumber = (page ?? 1);
             var data = students.ToPagedList(pageNumber, pageSize);
-            return View(data);
+            if (Request.IsAjaxRequest())
+                return PartialView("_SearchList", data);
+            else
+                return View(data);
         }
 
         // GET: Students/Details/5
