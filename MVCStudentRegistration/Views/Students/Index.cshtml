@@ -1,5 +1,6 @@
 ﻿@using MVCStudentRegistration.Helpers
-@model IEnumerable<MVCStudentRegistration.Models.Student>
+@using PagedList.Mvc
+@model PagedList.IPagedList<MVCStudentRegistration.Models.Student>
 
 @{
     ViewBag.Title = "Index";
@@ -17,7 +18,7 @@
         @using (Html.BeginForm("Index", "Students", FormMethod.Get))
         {
             <div class="input-group addon">
-                <input class="form-control" placeholder="student name" name="searchString" type="text" value="@ViewBag.SearchString" />
+                <input class="form-control" placeholder="student name" name="searchString" type="text" value="@ViewBag.CurrentFilter" />
                 <button class="btn btn-default" type="submit">Search</button>
             </div>
         }
@@ -28,15 +29,15 @@
 <table class="table">
     <tr>
         <th>
-            @Html.ActionLink("Name", "Index", new { sortOrder = "name", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.SearchString })
+            @Html.ActionLink("Name", "Index", new { sortOrder = "name", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.CurrentFilter })
             @Html.GetArrow((string)ViewBag.sortOrder, "name", (string)ViewBag.sortDir)
         </th>
         <th>
-            @Html.ActionLink("EnrollmentDate", "Index", new { sortOrder = "enrollmentDate", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.SearchString })
+            @Html.ActionLink("EnrollmentDate", "Index", new { sortOrder = "enrollmentDate", sortDir = string.IsNullOrEmpty(ViewBag.sortDir) ? "asc" : (ViewBag.sortDir == "asc" ? "desc" : "asc"), searchString = ViewBag.CurrentFilter })
             @Html.GetArrow((string)ViewBag.sortOrder, "enrollmentDate", (string)ViewBag.sortDir)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Photo)
+            Photo
         </th>
         <th></th>
     </tr>
@@ -65,3 +66,7 @@
     }
 
 </table>
+
+
+@Html.PagedListPager(Model, page => Url.Action("Index",
+        new { page, sortOrder = ViewBag.SortOrder, sortDir = ViewBag.SortDir, currentFilter = ViewBag.CurrentFilter }))

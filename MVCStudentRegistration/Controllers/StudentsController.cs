@@ -7,6 +7,7 @@ using MVCStudentRegistration.Helpers;
 using MVCStudentRegistration.Instraestructure;
 using MVCStudentRegistration.Models;
 using MVCStudentRegistration.ViewModels;
+using PagedList;
 
 namespace MVCStudentRegistration.Controllers
 {
@@ -15,35 +16,48 @@ namespace MVCStudentRegistration.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Students
-        public ActionResult Index(string sortOrder, string sortDir, string searchString)
+        public ActionResult Index(string sortDir, string searchString, string currentFilter, int? page, string sortOrder = "")
         {
-            ViewBag.SearchString = searchString;
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewBag.CurrentFilter = searchString;
             ViewBag.sortOrder = sortOrder;
             ViewBag.sortDir = sortDir;
-            
+
             var students = db.Students.AsQueryable();
             if (!string.IsNullOrEmpty(searchString))
-                students =  students.Where(s => s.Name.Contains(searchString));
-            
-            if (sortOrder!=null)
+                students = students.Where(s => s.Name.Contains(searchString));
+
+            switch (sortOrder.ToLower())
             {
-                switch (sortOrder.ToLower())
-                {
-                    case "name":
-                        if (sortDir.ToLower() == "desc")
-                            students = students.OrderByDescending(s => s.Name);
-                        else
-                            students = students.OrderBy(s => s.Name);
-                        break;
-                    case "enrollmentdate":
-                        if (sortDir.ToLower() == "desc")
-                            students = students.OrderByDescending(s => s.EnrollmentDate);
-                        else
-                            students = students.OrderBy(s => s.EnrollmentDate);
-                        break;
-                }
+                case "name":
+                    if (sortDir.ToLower() == "desc")
+                        students = students.OrderByDescending(s => s.Name);
+                    else
+                        students = students.OrderBy(s => s.Name);
+                    break;
+                case "enrollmentdate":
+                    if (sortDir.ToLower() == "desc")
+                        students = students.OrderByDescending(s => s.EnrollmentDate);
+                    else
+                        students = students.OrderBy(s => s.EnrollmentDate);
+                    break;
+                default:
+                    students = students.OrderBy(s => s.Name);
+                    break;
             }
-            return View(students.ToList());
+
+            int pageSize = 2;
+            int pageNumber = (page ?? 1);
+            var data = students.ToPagedList(pageNumber, pageSize);
+            return View(data);
         }
 
         // GET: Students/Details/5
@@ -120,7 +134,7 @@ namespace MVCStudentRegistration.Controllers
             if (ModelState.IsValid)
             {
                 Student student = db.Students.Find(studentVM.Id);
-                if (studentVM != null && studentVM.Photo!=null)
+                if (studentVM != null && studentVM.Photo != null)
                     student.Photo = ImageConverter.ByteArrayFromPostedFile(studentVM.Photo);
                 student.Name = studentVM.Name;
                 student.EnrollmentDate = studentVM.EnrollmentDate;
